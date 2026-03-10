@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalLens — Asli Reviews, Asli Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #1a1a24;
+  --border: #2a2a3a;
+  --accent: #ff6b35;
+  --accent2: #ffbe0b;
+  --text: #f0f0f5;
+  --muted: #6b6b80;
+  --green: #06d6a0;
+  --red: #ef233c;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content:'';
+  position:fixed; top:-50%; left:-50%;
+  width:200%; height:200%;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(255,107,53,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(255,190,11,0.05) 0%, transparent 50%);
+  animation: bgPulse 8s ease-in-out infinite alternate;
+  pointer-events:none; z-index:0;
+}
+@keyframes bgPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+.container { max-width:880px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }
+
+/* HEADER */
+header { padding:48px 0 16px; text-align:center; }
+.logo {
+  font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:5px; text-transform:uppercase; color:var(--accent);
+  margin-bottom:12px;
+  animation: fadeUp 0.5s ease both 0.1s;
+}
+h1 {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(38px,8vw,76px);
+  font-weight:800; line-height:1.04; letter-spacing:-2px;
+  animation: fadeUp 0.5s ease both 0.2s;
+}
+h1 span {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.tagline {
+  color:var(--muted); font-size:15px; margin-top:14px; font-weight:300;
+  animation: fadeUp 0.5s ease both 0.3s;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* SEARCH CARD */
+.search-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:28px; margin:36px 0;
+  animation: fadeUp 0.5s ease both 0.4s;
+  position:relative; overflow:hidden;
+}
+.search-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+}
+.search-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:12px; align-items:end;
+}
+@media(max-width:580px){ .search-grid { grid-template-columns:1fr; } }
+.field label {
+  display:block; font-size:11px; font-weight:600;
+  letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:7px;
+}
+input {
+  width:100%; background:var(--surface2);
+  border:1px solid var(--border); border-radius:10px;
+  padding:13px 15px; color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:15px;
+  outline:none; transition:border 0.2s, box-shadow 0.2s;
+}
+input:focus {
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(255,107,53,0.12);
+}
+input::placeholder { color:var(--muted); }
+.btn {
+  background: linear-gradient(135deg, var(--accent), #ff8c42);
+  border:none; border-radius:10px;
+  padding:13px 26px; color:#fff;
+  font-family:'Syne',sans-serif; font-size:13px;
+  font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  cursor:pointer; transition:all 0.2s; white-space:nowrap;
+}
+.btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,107,53,0.35); }
+.btn:active { transform:translateY(0); }
+.btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* ERROR */
+.error {
+  display:none; margin-top:14px;
+  background:rgba(239,35,60,0.08); border:1px solid rgba(239,35,60,0.25);
+  border-radius:10px; padding:14px 16px;
+  color:var(--red); font-size:14px;
+}
+.error.show { display:block; }
+
+/* LOADING */
+.loading { display:none; text-align:center; padding:56px 0; }
+.loading.show { display:block; }
+.spinner {
+  width:44px; height:44px;
+  border:3px solid var(--border); border-top-color:var(--accent);
+  border-radius:50%; animation:spin 0.75s linear infinite;
+  margin:0 auto 16px;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading p { color:var(--muted); font-size:14px; }
+.steps { margin-top:14px; display:flex; flex-direction:column; gap:8px; align-items:center; }
+.step { font-size:13px; color:var(--muted); opacity:0.3; transition:opacity 0.4s, color 0.4s; }
+.step.on { opacity:1; color:var(--accent); }
+
+/* RESULTS */
+.results { display:none; }
+.results.show { display:block; }
+
+/* BIZ HEADER */
+.biz-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:18px; padding:26px;
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:16px;
+  margin-bottom:14px;
+  animation: fadeUp 0.4s ease;
+}
+.biz-card h2 { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; }
+.biz-card .loc { color:var(--muted); font-size:13px; margin-top:4px; }
+.biz-card .cnt { color:var(--muted); font-size:12px; margin-top:3px; }
+.rating-box {
+  background: linear-gradient(135deg, var(--accent2), #ff9800);
+  border-radius:14px; padding:14px 20px; text-align:center; min-width:80px;
+}
+.rating-box .num {
+  font-family:'Syne',sans-serif; font-size:34px; font-weight:800;
+  color:#000; line-height:1;
+}
+.rating-box .lbl { font-size:10px; font-weight:600; color:rgba(0,0,0,0.55); letter-spacing:1px; text-transform:uppercase; }
+
+/* AI SUMMARY */
+.summary-card {
+  background: linear-gradient(135deg, rgba(6,214,160,0.07), rgba(6,214,160,0.02));
+  border:1px solid rgba(6,214,160,0.18);
+  border-radius:18px; padding:26px; margin-bottom:14px;
+  animation: fadeUp 0.4s ease 0.08s both;
+}
+.summary-card .tag {
+  font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  color:var(--green); margin-bottom:12px;
+}
+.summary-card p { font-size:15px; line-height:1.75; }
+
+/* REVIEWS */
+.rev-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:14px;
+  animation: fadeUp 0.4s ease 0.14s both;
+}
+.rev-header h3 { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; }
+.badge {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:20px; padding:4px 12px;
+  font-size:12px; color:var(--muted);
+}
+.reviews-grid { display:grid; gap:10px; }
+.rev-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:13px; padding:18px;
+  transition:border 0.2s, transform 0.2s, box-shadow 0.2s;
+  animation: fadeUp 0.4s ease both;
+  position:relative; overflow:hidden;
+}
+.rev-card::after {
+  content:'"';
+  position:absolute; top:-8px; right:14px;
+  font-family:'Syne',sans-serif; font-size:72px;
+  color:var(--border); line-height:1; pointer-events:none;
+}
+.rev-card:hover {
+  border-color:rgba(255,107,53,0.3);
+  transform:translateY(-2px);
+  box-shadow:0 6px 24px rgba(0,0,0,0.25);
+}
+.rev-card .text { font-size:14px; line-height:1.65; color:#bbbbd0; }
+.rev-card .date { font-size:11px; color:var(--muted); margin-top:8px; letter-spacing:1px; text-transform:uppercase; }
+
+.empty { text-align:center; padding:40px; color:var(--muted); }
+.empty .ico { font-size:38px; margin-bottom:10px; }
+
+footer { text-align:center; padding:40px 0; color:var(--muted); font-size:13px; }
+footer span { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">LocalLens</div>
+    <h1>Asli Reviews,<br><span>Asli Sach</span></h1>
+    <p class="tagline">Business name + location do — 20 latest reviews + AI summary milega, seedha</p>
+  </header>
+
+  <div class="search-card">
+    <div class="search-grid">
+      <div class="field">
+        <label>Business Name</label>
+        <input id="bizIn" type="text" placeholder="Sharma Dhaba, Jawed Habib...">
+      </div>
+      <div class="field">
+        <label>Location / City</label>
+        <input id="locIn" type="text" placeholder="Connaught Place Delhi, Bandra Mumbai...">
+      </div>
+      <button class="btn" id="searchBtn" onclick="doSearch()">🔍 Dhundo</button>
+    </div>
+    <div class="error" id="err"></div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Dhundh raha hoon...</p>
+    <div class="steps">
+      <div class="step" id="s1">🔍 Google Maps pe search ho raha hai...</div>
+      <div class="step" id="s2">📋 Reviews collect ho rahe hain...</div>
+      <div class="step" id="s3">🤖 AI summary ban rahi hai...</div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+
+    <div class="biz-card">
+      <div>
+        <h2 id="rBiz"></h2>
+        <div class="loc" id="rLoc"></div>
+        <div class="cnt" id="rCnt"></div>
+      </div>
+      <div class="rating-box">
+        <div class="num" id="rRating">—</div>
+        <div class="lbl">Rating</div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="tag">🤖 AI Summary</div>
+      <p id="rSummary"></p>
+    </div>
+
+    <div class="rev-header">
+      <h3>Latest Reviews</h3>
+      <span class="badge" id="rCount">0 reviews</span>
+    </div>
+
+    <div class="reviews-grid" id="rGrid"></div>
+
+  </div>
+
+  <footer>Made with <span>♥</span> in India &nbsp;·&nbsp; LocalLens © 2025</footer>
+</div>
+
+<script>
+let stepTimer = null;
+
+async function doSearch() {
+  const biz = document.getElementById('bizIn').value.trim();
+  const loc = document.getElementById('locIn').value.trim();
+  const err = document.getElementById('err');
+
+  if (!biz || !loc) {
+    err.textContent = '⚠️ Business name aur location dono bharo!';
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('searchBtn').disabled = true;
+  startSteps();
+
+  try {
+    const res = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ business_name: biz, location: loc })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Server error');
+    showResults(data);
+  } catch(e) {
+    err.textContent = '❌ ' + e.message;
+    err.classList.add('show');
+  } finally {
+    document.getElementById('loading').classList.remove('show');
+    document.getElementById('searchBtn').disabled = false;
+    clearSteps();
+  }
+}
+
+function startSteps() {
+  ['s1','s2','s3'].forEach(id => document.getElementById(id).classList.remove('on'));
+  let i = 0;
+  const ids = ['s1','s2','s3'];
+  stepTimer = setInterval(() => {
+    if (i < ids.length) document.getElementById(ids[i++]).classList.add('on');
+    else clearInterval(stepTimer);
+  }, 1400);
+}
+
+function clearSteps() {
+  clearInterval(stepTimer);
+  ['s1','s2','s3'].forEach(id => document.getElementById(id).classList.remove('on'));
+}
+
+function showResults(d) {
+  document.getElementById('rBiz').textContent = d.business_name;
+  document.getElementById('rLoc').textContent = '📍 ' + d.location;
+  document.getElementById('rCnt').textContent = d.total_reviews !== 'N/A' ? `${d.total_reviews} total Google reviews` : '';
+  document.getElementById('rRating').textContent = d.rating !== 'N/A' ? d.rating : '?';
+  document.getElementById('rSummary').textContent = d.ai_summary;
+  document.getElementById('rCount').textContent = `${d.reviews_found} reviews mile`;
+
+  const grid = document.getElementById('rGrid');
+  grid.innerHTML = '';
+
+  if (d.reviews && d.reviews.length > 0) {
+    d.reviews.forEach((r, i) => {
+      const card = document.createElement('div');
+      card.className = 'rev-card';
+      card.style.animationDelay = `${0.2 + i * 0.04}s`;
+      card.innerHTML = `<div class="text">${r.text}</div><div class="date">${r.date || 'Recent'}</div>`;
+      grid.appendChild(card);
+    });
+  } else {
+    grid.innerHTML = `<div class="empty"><div class="ico">🔍</div><p>Koi review nahi mila</p><p style="font-size:13px;margin-top:6px">Business name ya location thoda change karke try karo</p></div>`;
+  }
+
+  document.getElementById('results').classList.add('show');
+  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+document.addEventListener('keydown', e => { if(e.key === 'Enter') doSearch(); });
+</script>
+</body>
+</html>
