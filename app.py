@@ -18,6 +18,11 @@ app.add_middleware(
 )
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# Startup check — logs mein dikhega
+if GROQ_API_KEY:
+    print(f"✅ GROQ KEY MILI: {GROQ_API_KEY[:8]}...")
+else:
+    print("❌ GROQ KEY NAHI MILI — Environment variable check karo!")
 
 # ─────────────────────────────────────────
 # REQUEST MODEL
