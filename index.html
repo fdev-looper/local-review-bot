@@ -1,373 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LocalLens — Asli Reviews, Asli Log</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LocalReview AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg: #0a0a0f;
-  --surface: #111118;
-  --surface2: #1a1a24;
-  --border: #2a2a3a;
-  --accent: #ff6b35;
-  --accent2: #ffbe0b;
-  --text: #f0f0f5;
-  --muted: #6b6b80;
-  --green: #06d6a0;
-  --red: #ef233c;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#04040a;--s1:#0c0c18;--s2:#12121f;--s3:#1a1a2e;
+  --border:#ffffff0f;--border2:#ffffff18;
+  --acc:#7c6bff;--acc2:#b8a9ff;--acc3:#38d9f5;
+  --gold:#ffd166;--red:#ff6b6b;--green:#06d6a0;
+  --text:#f0f0ff;--muted:#6b6b8a;--muted2:#9090b0;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-body::before {
-  content:'';
-  position:fixed; top:-50%; left:-50%;
-  width:200%; height:200%;
-  background:
-    radial-gradient(ellipse at 20% 20%, rgba(255,107,53,0.07) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(255,190,11,0.05) 0%, transparent 50%);
-  animation: bgPulse 8s ease-in-out infinite alternate;
-  pointer-events:none; z-index:0;
-}
-@keyframes bgPulse {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.08); }
-}
-.container { max-width:880px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.6}
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);animation:drift 20s ease-in-out infinite}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(124,107,255,0.12),transparent 70%);top:-200px;left:-200px;animation-delay:0s}
+.orb2{width:500px;height:500px;background:radial-gradient(circle,rgba(56,217,245,0.08),transparent 70%);bottom:-150px;right:-150px;animation-delay:-7s}
+.orb3{width:400px;height:400px;background:radial-gradient(circle,rgba(255,107,107,0.06),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:-14s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(0.95)}}
 
-/* HEADER */
-header { padding:48px 0 16px; text-align:center; }
-.logo {
-  font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
-  letter-spacing:5px; text-transform:uppercase; color:var(--accent);
-  margin-bottom:12px;
-  animation: fadeUp 0.5s ease both 0.1s;
-}
-h1 {
-  font-family:'Syne',sans-serif;
-  font-size:clamp(38px,8vw,76px);
-  font-weight:800; line-height:1.04; letter-spacing:-2px;
-  animation: fadeUp 0.5s ease both 0.2s;
-}
-h1 span {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-.tagline {
-  color:var(--muted); font-size:15px; margin-top:14px; font-weight:300;
-  animation: fadeUp 0.5s ease both 0.3s;
-}
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(18px); }
-  to   { opacity:1; transform:translateY(0); }
-}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(4,4,10,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;display:flex;align-items:center;gap:10px;letter-spacing:-0.5px}
+.nav-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--acc),var(--acc3));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.nav-pill{background:var(--s2);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:0.75rem;color:var(--muted2);display:flex;align-items:center;gap:6px}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(6,214,160,0.4)}50%{opacity:0.8;box-shadow:0 0 0 6px rgba(6,214,160,0)}}
 
-/* SEARCH CARD */
-.search-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:20px; padding:28px; margin:36px 0;
-  animation: fadeUp 0.5s ease both 0.4s;
-  position:relative; overflow:hidden;
-}
-.search-card::before {
-  content:'';
-  position:absolute; top:0; left:0; right:0; height:1px;
-  background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
-}
-.search-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr auto;
-  gap:12px; align-items:end;
-}
-@media(max-width:580px){ .search-grid { grid-template-columns:1fr; } }
-.field label {
-  display:block; font-size:11px; font-weight:600;
-  letter-spacing:2px; text-transform:uppercase;
-  color:var(--muted); margin-bottom:7px;
-}
-input {
-  width:100%; background:var(--surface2);
-  border:1px solid var(--border); border-radius:10px;
-  padding:13px 15px; color:var(--text);
-  font-family:'DM Sans',sans-serif; font-size:15px;
-  outline:none; transition:border 0.2s, box-shadow 0.2s;
-}
-input:focus {
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(255,107,53,0.12);
-}
-input::placeholder { color:var(--muted); }
-.btn {
-  background: linear-gradient(135deg, var(--accent), #ff8c42);
-  border:none; border-radius:10px;
-  padding:13px 26px; color:#fff;
-  font-family:'Syne',sans-serif; font-size:13px;
-  font-weight:700; letter-spacing:1px; text-transform:uppercase;
-  cursor:pointer; transition:all 0.2s; white-space:nowrap;
-}
-.btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,107,53,0.35); }
-.btn:active { transform:translateY(0); }
-.btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; box-shadow:none; }
+.hero{position:relative;z-index:1;padding:160px 40px 80px;max-width:900px;margin:0 auto;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,107,255,0.1);border:1px solid rgba(124,107,255,0.25);border-radius:20px;padding:6px 16px;font-size:0.78rem;color:var(--acc2);margin-bottom:32px;letter-spacing:0.5px}
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:20px}
+.hero-title .line1{display:block;color:var(--text)}
+.hero-title .line2{display:block;background:linear-gradient(135deg,var(--acc2) 0%,var(--acc3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:var(--muted2);font-size:1.05rem;font-weight:300;max-width:520px;margin:0 auto 48px;line-height:1.7}
 
-/* ERROR */
-.error {
-  display:none; margin-top:14px;
-  background:rgba(239,35,60,0.08); border:1px solid rgba(239,35,60,0.25);
-  border-radius:10px; padding:14px 16px;
-  color:var(--red); font-size:14px;
-}
-.error.show { display:block; }
+.search-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto}
+.search-container{background:var(--s2);border:1px solid var(--border2);border-radius:20px;padding:8px 8px 8px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 0 0 0 rgba(124,107,255,0);transition:border-color 0.3s,box-shadow 0.3s}
+.search-container:focus-within{border-color:rgba(124,107,255,0.5);box-shadow:0 0 0 4px rgba(124,107,255,0.08),0 30px 80px rgba(0,0,0,0.5)}
+.search-icon{color:var(--muted);font-size:1.1rem;flex-shrink:0}
+.search-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:400;padding:10px 0}
+.search-input::placeholder{color:var(--muted)}
+.search-btn{background:linear-gradient(135deg,var(--acc),#9c8eff);border:none;border-radius:14px;padding:13px 26px;color:#fff;font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:transform 0.15s,opacity 0.15s,box-shadow 0.2s;white-space:nowrap;box-shadow:0 4px 20px rgba(124,107,255,0.3)}
+.search-btn:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(124,107,255,0.4)}
+.search-btn:active{transform:translateY(0) scale(0.98)}
+.search-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:20px}
+.chip{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:0.78rem;color:var(--muted2);cursor:pointer;transition:all 0.2s}
+.chip:hover{background:rgba(124,107,255,0.1);border-color:rgba(124,107,255,0.3);color:var(--acc2);transform:translateY(-1px)}
 
-/* LOADING */
-.loading { display:none; text-align:center; padding:56px 0; }
-.loading.show { display:block; }
-.spinner {
-  width:44px; height:44px;
-  border:3px solid var(--border); border-top-color:var(--accent);
-  border-radius:50%; animation:spin 0.75s linear infinite;
-  margin:0 auto 16px;
-}
-@keyframes spin { to { transform:rotate(360deg); } }
-.loading p { color:var(--muted); font-size:14px; }
-.steps { margin-top:14px; display:flex; flex-direction:column; gap:8px; align-items:center; }
-.step { font-size:13px; color:var(--muted); opacity:0.3; transition:opacity 0.4s, color 0.4s; }
-.step.on { opacity:1; color:var(--accent); }
+.main{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 24px 100px}
 
-/* RESULTS */
-.results { display:none; }
-.results.show { display:block; }
+.loading{display:none;text-align:center;padding:80px 0}
+.loader-ring{width:60px;height:60px;border:2px solid var(--s3);border-top:2px solid var(--acc);border-right:2px solid var(--acc3);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{color:var(--muted2);font-size:0.9rem;line-height:2.2}
+.loader-step{transition:color 0.5s,transform 0.3s;transform:translateX(0)}
+.loader-step.active{color:var(--acc2);transform:translateX(6px)}
 
-/* BIZ HEADER */
-.biz-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:18px; padding:26px;
-  display:flex; justify-content:space-between; align-items:center;
-  flex-wrap:wrap; gap:16px;
-  margin-bottom:14px;
-  animation: fadeUp 0.4s ease;
-}
-.biz-card h2 { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; }
-.biz-card .loc { color:var(--muted); font-size:13px; margin-top:4px; }
-.biz-card .cnt { color:var(--muted); font-size:12px; margin-top:3px; }
-.rating-box {
-  background: linear-gradient(135deg, var(--accent2), #ff9800);
-  border-radius:14px; padding:14px 20px; text-align:center; min-width:80px;
-}
-.rating-box .num {
-  font-family:'Syne',sans-serif; font-size:34px; font-weight:800;
-  color:#000; line-height:1;
-}
-.rating-box .lbl { font-size:10px; font-weight:600; color:rgba(0,0,0,0.55); letter-spacing:1px; text-transform:uppercase; }
+.error-box{display:none;background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.2);border-radius:16px;padding:18px 24px;color:var(--red);margin-bottom:28px;font-size:0.9rem}
 
-/* AI SUMMARY */
-.summary-card {
-  background: linear-gradient(135deg, rgba(6,214,160,0.07), rgba(6,214,160,0.02));
-  border:1px solid rgba(6,214,160,0.18);
-  border-radius:18px; padding:26px; margin-bottom:14px;
-  animation: fadeUp 0.4s ease 0.08s both;
-}
-.summary-card .tag {
-  font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
-  color:var(--green); margin-bottom:12px;
-}
-.summary-card p { font-size:15px; line-height:1.75; }
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-/* REVIEWS */
-.rev-header {
-  display:flex; justify-content:space-between; align-items:center;
-  margin-bottom:14px;
-  animation: fadeUp 0.4s ease 0.14s both;
-}
-.rev-header h3 { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; }
-.badge {
-  background:var(--surface2); border:1px solid var(--border);
-  border-radius:20px; padding:4px 12px;
-  font-size:12px; color:var(--muted);
-}
-.reviews-grid { display:grid; gap:10px; }
-.rev-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:13px; padding:18px;
-  transition:border 0.2s, transform 0.2s, box-shadow 0.2s;
-  animation: fadeUp 0.4s ease both;
-  position:relative; overflow:hidden;
-}
-.rev-card::after {
-  content:'"';
-  position:absolute; top:-8px; right:14px;
-  font-family:'Syne',sans-serif; font-size:72px;
-  color:var(--border); line-height:1; pointer-events:none;
-}
-.rev-card:hover {
-  border-color:rgba(255,107,53,0.3);
-  transform:translateY(-2px);
-  box-shadow:0 6px 24px rgba(0,0,0,0.25);
-}
-.rev-card .text { font-size:14px; line-height:1.65; color:#bbbbd0; }
-.rev-card .date { font-size:11px; color:var(--muted); margin-top:8px; letter-spacing:1px; text-transform:uppercase; }
+.place-card{background:var(--s2);border:1px solid var(--border2);border-radius:24px;padding:28px;margin-bottom:20px;display:flex;gap:24px;align-items:flex-start;animation:fadeUp 0.5s ease}
+.place-thumb{width:90px;height:90px;border-radius:16px;object-fit:cover;flex-shrink:0;background:var(--s3)}
+.place-thumb-placeholder{width:90px;height:90px;border-radius:16px;background:linear-gradient(135deg,var(--s3),var(--s2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0}
+.place-name{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px}
+.place-address{color:var(--muted);font-size:0.82rem;margin-bottom:12px}
+.rating-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rating-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--gold);line-height:1}
+.review-count{color:var(--muted);font-size:0.82rem}
 
-.empty { text-align:center; padding:40px; color:var(--muted); }
-.empty .ico { font-size:38px; margin-bottom:10px; }
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;animation:fadeUp 0.5s 0.05s ease both}
+.stat-card{background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:18px 20px;text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--acc2),var(--acc3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.stat-label{color:var(--muted);font-size:0.72rem;letter-spacing:0.5px;text-transform:uppercase}
 
-footer { text-align:center; padding:40px 0; color:var(--muted); font-size:13px; }
-footer span { color:var(--accent); }
+.ai-card{background:linear-gradient(135deg,rgba(124,107,255,0.06) 0%,rgba(56,217,245,0.04) 100%);border:1px solid rgba(124,107,255,0.18);border-radius:24px;padding:28px;margin-bottom:20px;animation:fadeUp 0.5s 0.1s ease both;position:relative;overflow:hidden}
+.ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,107,255,0.5),rgba(56,217,245,0.5),transparent)}
+.ai-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.ai-title{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:0.5px;color:var(--acc2)}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);animation:pulse 2s ease infinite}
+.gemini-tag{background:rgba(56,217,245,0.1);border:1px solid rgba(56,217,245,0.2);border-radius:8px;padding:3px 10px;font-size:0.7rem;color:var(--acc3);font-weight:500}
+.ai-content{color:#d0d0f0;font-size:0.92rem;line-height:1.8;white-space:pre-wrap}
+.ai-content strong{color:var(--acc2);font-weight:600}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;animation:fadeUp 0.5s 0.15s ease both}
+.section-title{font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.count-badge{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:3px 10px;font-size:0.75rem;color:var(--muted2)}
+
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.review-card{background:var(--s2);border:1px solid var(--border);border-radius:18px;padding:20px;transition:border-color 0.25s,transform 0.25s,box-shadow 0.25s;animation:fadeUp 0.5s ease both;cursor:default}
+.review-card:hover{border-color:rgba(124,107,255,0.3);transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,0.3)}
+.review-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.review-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc3));display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#fff;flex-shrink:0}
+.review-meta{margin-left:10px;flex:1}
+.review-author{font-weight:600;font-size:0.88rem;margin-bottom:2px}
+.review-date{color:var(--muted);font-size:0.72rem}
+.review-rating-pill{display:flex;align-items:center;gap:4px;background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.15);border-radius:8px;padding:4px 8px;font-size:0.78rem;font-weight:600;color:var(--gold)}
+.review-text{color:#a0a0c0;font-size:0.83rem;line-height:1.65}
+.sentiment-bar{height:2px;border-radius:2px;margin-top:14px;background:var(--s3);overflow:hidden}
+.sentiment-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+
+.empty{text-align:center;padding:100px 20px;animation:fadeUp 0.5s ease}
+.empty-visual{width:120px;height:120px;background:var(--s2);border:1px solid var(--border);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;margin:0 auto 28px}
+.empty h3{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:10px}
+.empty p{color:var(--muted2);font-size:0.9rem;line-height:1.7}
+
+@media(max-width:640px){
+  nav{padding:14px 20px}
+  .hero{padding:120px 20px 60px}
+  .hero-title{font-size:2.4rem}
+  .place-card{flex-direction:column;gap:16px}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .reviews-grid{grid-template-columns:1fr}
+  .main{padding:0 16px 60px}
+}
 </style>
 </head>
 <body>
-<div class="container">
 
-  <header>
-    <div class="logo">LocalLens</div>
-    <h1>Asli Reviews,<br><span>Asli Sach</span></h1>
-    <p class="tagline">Business name + location do — 20 latest reviews + AI summary milega, seedha</p>
-  </header>
+<div class="orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
 
-  <div class="search-card">
-    <div class="search-grid">
-      <div class="field">
-        <label>Business Name</label>
-        <input id="bizIn" type="text" placeholder="Sharma Dhaba, Jawed Habib...">
-      </div>
-      <div class="field">
-        <label>Location / City</label>
-        <input id="locIn" type="text" placeholder="Connaught Place Delhi, Bandra Mumbai...">
-      </div>
-      <button class="btn" id="searchBtn" onclick="doSearch()">🔍 Dhundo</button>
-    </div>
-    <div class="error" id="err"></div>
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">🔍</div>
+    LocalReview AI
   </div>
+  <div class="nav-pill">
+    <div class="nav-dot"></div>
+    Live · Powered by Gemini
+  </div>
+</nav>
 
+<div class="hero">
+  <div class="hero-badge">✦ Google Reviews &nbsp;·&nbsp; AI Analysis &nbsp;·&nbsp; Instant Insights</div>
+  <h1 class="hero-title">
+    <span class="line1">Know Before</span>
+    <span class="line2">You Go.</span>
+  </h1>
+  <p class="hero-sub">Search any clinic, restaurant, or local business — get deep AI‑powered insights from real customer reviews in seconds.</p>
+
+  <div class="search-wrap">
+    <div class="search-container">
+      <span class="search-icon">⌕</span>
+      <input class="search-input" id="searchInput" type="text"
+        placeholder="Try 'Apollo Clinic Ahmedabad' or 'Dominos Mumbai'..."
+        onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="search-btn" id="searchBtn" onclick="doSearch()">Analyze →</button>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="quick('Apollo Clinic Ahmedabad')">🏥 Apollo Clinic</span>
+      <span class="chip" onclick="quick('Sterling Hospital Ahmedabad')">🏨 Sterling Hospital</span>
+      <span class="chip" onclick="quick('Dominos Pizza Surat')">🍕 Dominos Surat</span>
+      <span class="chip" onclick="quick('Café Coffee Day Vadodara')">☕ CCD Vadodara</span>
+      <span class="chip" onclick="quick('McDonald\'s Ahmedabad')">🍔 McDonald's</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
   <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <p>Dhundh raha hoon...</p>
-    <div class="steps">
-      <div class="step" id="s1">🔍 Google Maps pe search ho raha hai...</div>
-      <div class="step" id="s2">📋 Reviews collect ho rahe hain...</div>
-      <div class="step" id="s3">🤖 AI summary ban rahi hai...</div>
+    <div class="loader-ring"></div>
+    <div class="loader-text">
+      <div class="loader-step" id="ls1">🗺️ &nbsp;Locating on Google Maps...</div>
+      <div class="loader-step" id="ls2">📥 &nbsp;Fetching customer reviews...</div>
+      <div class="loader-step" id="ls3">🤖 &nbsp;Gemini AI analyzing sentiment...</div>
+      <div class="loader-step" id="ls4">✨ &nbsp;Generating your report...</div>
     </div>
   </div>
 
-  <div class="results" id="results">
+  <div class="error-box" id="errorBox"></div>
+  <div id="results"></div>
 
-    <div class="biz-card">
-      <div>
-        <h2 id="rBiz"></h2>
-        <div class="loc" id="rLoc"></div>
-        <div class="cnt" id="rCnt"></div>
-      </div>
-      <div class="rating-box">
-        <div class="num" id="rRating">—</div>
-        <div class="lbl">Rating</div>
-      </div>
-    </div>
-
-    <div class="summary-card">
-      <div class="tag">🤖 AI Summary</div>
-      <p id="rSummary"></p>
-    </div>
-
-    <div class="rev-header">
-      <h3>Latest Reviews</h3>
-      <span class="badge" id="rCount">0 reviews</span>
-    </div>
-
-    <div class="reviews-grid" id="rGrid"></div>
-
+  <div class="empty" id="emptyState">
+    <div class="empty-visual">🗺️</div>
+    <h3>Search Any Place to Begin</h3>
+    <p>Clinics · Restaurants · Hotels · Hospitals<br/>We analyze Google reviews so you don't have to.</p>
   </div>
-
-  <footer>Made with <span>♥</span> in India &nbsp;·&nbsp; LocalLens © 2025</footer>
 </div>
 
 <script>
-let stepTimer = null;
+const WORKER = 'https://review-bot5.giggabytelelo.workers.dev';
 
-async function doSearch() {
-  const biz = document.getElementById('bizIn').value.trim();
-  const loc = document.getElementById('locIn').value.trim();
-  const err = document.getElementById('err');
-
-  if (!biz || !loc) {
-    err.textContent = '⚠️ Business name aur location dono bharo!';
-    err.classList.add('show');
-    return;
-  }
-  err.classList.remove('show');
-
-  document.getElementById('results').classList.remove('show');
-  document.getElementById('loading').classList.add('show');
-  document.getElementById('searchBtn').disabled = true;
-  startSteps();
-
-  try {
-    const res = await fetch('/api/search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ business_name: biz, location: loc })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Server error');
-    showResults(data);
-  } catch(e) {
-    err.textContent = '❌ ' + e.message;
-    err.classList.add('show');
-  } finally {
-    document.getElementById('loading').classList.remove('show');
-    document.getElementById('searchBtn').disabled = false;
-    clearSteps();
-  }
+function quick(q){
+  document.getElementById('searchInput').value = q;
+  doSearch();
+  window.scrollTo({top:document.querySelector('.main').offsetTop - 80,behavior:'smooth'});
 }
 
-function startSteps() {
-  ['s1','s2','s3'].forEach(id => document.getElementById(id).classList.remove('on'));
-  let i = 0;
-  const ids = ['s1','s2','s3'];
-  stepTimer = setInterval(() => {
-    if (i < ids.length) document.getElementById(ids[i++]).classList.add('on');
-    else clearInterval(stepTimer);
-  }, 1400);
+function starsHTML(rating){
+  let html='';
+  for(let i=1;i<=5;i++){
+    const full=i<=Math.floor(rating);
+    const half=!full&&i<=Math.ceil(rating)&&rating%1>=0.4;
+    const c=full?'#ffd166':half?'#ffd16688':'#2a2a40';
+    const sc=full||half?'#ffd166':'#2a2a40';
+    html+=`<svg viewBox="0 0 24 24" style="width:15px;height:15px;display:inline-block;vertical-align:middle"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" fill="${c}" stroke="${sc}" stroke-width="1.5"/></svg>`;
+  }
+  return html;
 }
 
-function clearSteps() {
+function avatarLetter(name){return (name||'A').trim()[0].toUpperCase()}
+
+function sentimentGrad(rating){
+  if(rating>=4)return'linear-gradient(90deg,#06d6a0,#38d9f5)';
+  if(rating>=3)return'linear-gradient(90deg,#ffd166,#ffb347)';
+  return'linear-gradient(90deg,#ff6b6b,#ff4444)';
+}
+
+let stepTimer;
+function animateSteps(){
   clearInterval(stepTimer);
-  ['s1','s2','s3'].forEach(id => document.getElementById(id).classList.remove('on'));
+  ['ls1','ls2','ls3','ls4'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('ls1').classList.add('active');
+  let i=0;
+  stepTimer=setInterval(()=>{
+    i++;if(i<4)document.getElementById('ls'+(i+1)).classList.add('active');
+    else clearInterval(stepTimer);
+  },1400);
 }
 
-function showResults(d) {
-  document.getElementById('rBiz').textContent = d.business_name;
-  document.getElementById('rLoc').textContent = '📍 ' + d.location;
-  document.getElementById('rCnt').textContent = d.total_reviews !== 'N/A' ? `${d.total_reviews} total Google reviews` : '';
-  document.getElementById('rRating').textContent = d.rating !== 'N/A' ? d.rating : '?';
-  document.getElementById('rSummary').textContent = d.ai_summary;
-  document.getElementById('rCount').textContent = `${d.reviews_found} reviews mile`;
+async function doSearch(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q){alert('Please enter a place name!');return;}
 
-  const grid = document.getElementById('rGrid');
-  grid.innerHTML = '';
+  document.getElementById('loading').style.display='block';
+  document.getElementById('results').innerHTML='';
+  document.getElementById('errorBox').style.display='none';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('searchBtn').disabled=true;
+  document.getElementById('searchBtn').textContent='...';
+  animateSteps();
 
-  if (d.reviews && d.reviews.length > 0) {
-    d.reviews.forEach((r, i) => {
-      const card = document.createElement('div');
-      card.className = 'rev-card';
-      card.style.animationDelay = `${0.2 + i * 0.04}s`;
-      card.innerHTML = `<div class="text">${r.text}</div><div class="date">${r.date || 'Recent'}</div>`;
-      grid.appendChild(card);
-    });
-  } else {
-    grid.innerHTML = `<div class="empty"><div class="ico">🔍</div><p>Koi review nahi mila</p><p style="font-size:13px;margin-top:6px">Business name ya location thoda change karke try karo</p></div>`;
+  try{
+    const res=await fetch(`${WORKER}/search?place=${encodeURIComponent(q)}`);
+    const data=await res.json();
+    if(!res.ok||data.error)throw new Error(data.error||'Something went wrong');
+    renderResults(data);
+  }catch(err){
+    const box=document.getElementById('errorBox');
+    box.innerHTML=`❌ <strong>Error:</strong> ${err.message}. Try a more specific search like "Apollo Clinic Ahmedabad".`;
+    box.style.display='block';
+    document.getElementById('emptyState').style.display='block';
+  }finally{
+    clearInterval(stepTimer);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('searchBtn').disabled=false;
+    document.getElementById('searchBtn').textContent='Analyze →';
   }
-
-  document.getElementById('results').classList.add('show');
-  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
-document.addEventListener('keydown', e => { if(e.key === 'Enter') doSearch(); });
+function renderResults(data){
+  const {place,reviews,summary}=data;
+  const {meta,reviews:rvs}=reviews;
+
+  const pos=rvs.filter(r=>r.rating>=4).length;
+  const neg=rvs.filter(r=>r.rating<=2).length;
+  const avg=rvs.length?(rvs.reduce((a,r)=>a+r.rating,0)/rvs.length).toFixed(1):(meta.rating||0);
+  const fmt=(summary||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+
+  const placeHTML=`
+  <div class="place-card">
+    ${meta.thumbnail
+      ?`<img src="${meta.thumbnail}" class="place-thumb" alt="place" onerror="this.outerHTML='<div class=place-thumb-placeholder>🏢</div>'">`
+      :`<div class="place-thumb-placeholder">🏢</div>`}
+    <div style="flex:1;min-width:0">
+      <div class="place-name">${meta.placeName||place}</div>
+      ${meta.address?`<div class="place-address">📍 ${meta.address}</div>`:''}
+      <div class="rating-row">
+        <div class="rating-num">${meta.rating||avg}</div>
+        <div style="display:flex;gap:2px;align-items:center">${starsHTML(parseFloat(meta.rating||avg))}</div>
+        ${meta.totalReviews?`<div class="review-count">${Number(meta.totalReviews).toLocaleString()} reviews</div>`:''}
+      </div>
+    </div>
+  </div>`;
+
+  const statsHTML=`
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">${meta.rating||avg}</div>
+      <div class="stat-label">Overall Rating</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">${pos}</div>
+      <div class="stat-label">Positive Reviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">${neg}</div>
+      <div class="stat-label">Critical Reviews</div>
+    </div>
+  </div>`;
+
+  const aiHTML=`
+  <div class="ai-card">
+    <div class="ai-header">
+      <div class="ai-title"><div class="ai-dot"></div>AI ANALYSIS REPORT</div>
+      <div class="gemini-tag">Gemini 1.5 Flash</div>
+    </div>
+    <div class="ai-content">${fmt}</div>
+  </div>`;
+
+  const reviewsHTML=rvs.length?`
+  <div class="section-header">
+    <div class="section-title">Customer Reviews</div>
+    <div class="count-badge">${rvs.length} fetched</div>
+  </div>
+  <div class="reviews-grid">
+    ${rvs.map((r,i)=>`
+    <div class="review-card" style="animation-delay:${i*0.06}s">
+      <div class="review-top">
+        <div style="display:flex;align-items:center;flex:1;min-width:0">
+          <div class="review-avatar">${avatarLetter(r.author)}</div>
+          <div class="review-meta">
+            <div class="review-author">${r.author}</div>
+            <div class="review-date">${r.date||''}</div>
+          </div>
+        </div>
+        <div class="review-rating-pill">★ ${r.rating}</div>
+      </div>
+      <div class="review-text">${r.text||'<em style="opacity:0.4">No text provided</em>'}</div>
+      <div class="sentiment-bar"><div class="sentiment-fill" style="width:${(r.rating/5)*100}%;background:${sentimentGrad(r.rating)}"></div></div>
+    </div>`).join('')}
+  </div>`:'';
+
+  document.getElementById('results').innerHTML=placeHTML+statsHTML+aiHTML+reviewsHTML;
+}
 </script>
 </body>
 </html>
