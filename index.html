@@ -171,7 +171,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 40px;display:fl
     <div class="loader-ring"></div>
     <div class="loader-text">
       <div class="loader-step" id="ls1">🗺️ &nbsp;Locating on Google Maps...</div>
-      <div class="loader-step" id="ls2">📥 &nbsp;Fetching customer reviews...</div>
+      <div class="loader-step" id="ls2">📥 &nbsp;Fetching reviews (high + low ratings)...</div>
       <div class="loader-step" id="ls3">🤖 &nbsp;Gemini AI analyzing sentiment...</div>
       <div class="loader-step" id="ls4">✨ &nbsp;Generating your report...</div>
     </div>
@@ -259,13 +259,21 @@ async function doSearch(){
 }
 
 function renderResults(data){
-  const {place,reviews,summary}=data;
-  const {meta,reviews:rvs}=reviews;
+  // ✅ FIX: summary aur modelUsed directly data pe hain, reviews ke andar nahi
+  const { place, reviews, summary, modelUsed } = data;
+  const { meta, reviews: rvs } = reviews;
 
-  const pos=rvs.filter(r=>r.rating>=4).length;
-  const neg=rvs.filter(r=>r.rating<=2).length;
-  const avg=rvs.length?(rvs.reduce((a,r)=>a+r.rating,0)/rvs.length).toFixed(1):(meta.rating||0);
-  const fmt=(summary||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  const pos = rvs.filter(r => r.rating >= 4).length;
+  const neg = rvs.filter(r => r.rating <= 2).length;
+  const avg = rvs.length
+    ? (rvs.reduce((a,r) => a + r.rating, 0) / rvs.length).toFixed(1)
+    : (meta.rating || 0);
+
+  // ✅ FIX: summary fallback message bhi handle karo
+  const summaryText = summary || 'AI analysis unavailable for this place.';
+  const fmt = summaryText
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
 
   const placeHTML=`
   <div class="place-card">
@@ -299,11 +307,16 @@ function renderResults(data){
     </div>
   </div>`;
 
+  // ✅ FIX: modelUsed dynamically show karo
+  const modelLabel = modelUsed && modelUsed !== 'none'
+    ? modelUsed.replace('gemini-', 'Gemini ').replace('-', ' ').toUpperCase().replace('GEMINI ', 'Gemini ')
+    : 'Gemini AI';
+
   const aiHTML=`
   <div class="ai-card">
     <div class="ai-header">
       <div class="ai-title"><div class="ai-dot"></div>AI ANALYSIS REPORT</div>
-      <div class="gemini-tag">Gemini 1.5 Flash</div>
+      <div class="gemini-tag">${modelLabel}</div>
     </div>
     <div class="ai-content">${fmt}</div>
   </div>`;
