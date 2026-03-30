@@ -216,6 +216,28 @@ function sentimentGrad(rating){
   return'linear-gradient(90deg,#ff6b6b,#ff4444)';
 }
 
+// ✅ FIX: Correct model name display
+// "gemini-2.5-flash-preview-04-17" → "Gemini 2.5 Flash"
+// "gemini-2.0-flash" → "Gemini 2.0 Flash"
+// "gemini-1.5-flash" → "Gemini 1.5 Flash"
+function formatModelName(modelId) {
+  if (!modelId || modelId === 'none') return 'Gemini AI';
+  // Extract version + type from model id
+  // e.g. "gemini-2.5-flash-preview-04-17" → "Gemini 2.5 Flash"
+  // e.g. "gemini-2.0-flash-lite" → "Gemini 2.0 Flash Lite"
+  const match = modelId.match(/^gemini-(\d+\.\d+)-(\w+)/);
+  if (match) {
+    const version = match[1];  // "2.5"
+    const type = match[2];     // "flash" or "pro"
+    const typeCap = type.charAt(0).toUpperCase() + type.slice(1); // "Flash"
+    // Check for lite suffix
+    const isLite = modelId.includes('flash-lite');
+    return `Gemini ${version} ${typeCap}${isLite ? ' Lite' : ''}`;
+  }
+  // Fallback: clean up dashes
+  return modelId.replace(/^gemini-/, 'Gemini ').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 let stepTimer;
 function animateSteps(){
   clearInterval(stepTimer);
@@ -259,7 +281,6 @@ async function doSearch(){
 }
 
 function renderResults(data){
-  // ✅ FIX: summary aur modelUsed directly data pe hain, reviews ke andar nahi
   const { place, reviews, summary, modelUsed } = data;
   const { meta, reviews: rvs } = reviews;
 
@@ -269,8 +290,8 @@ function renderResults(data){
     ? (rvs.reduce((a,r) => a + r.rating, 0) / rvs.length).toFixed(1)
     : (meta.rating || 0);
 
-  // ✅ FIX: summary fallback message bhi handle karo
-  const summaryText = summary || 'AI analysis unavailable for this place.';
+  // ✅ FIX: summary fallback + trim whitespace
+  const summaryText = (summary || '').trim() || 'AI analysis unavailable for this place.';
   const fmt = summaryText
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>');
@@ -307,10 +328,8 @@ function renderResults(data){
     </div>
   </div>`;
 
-  // ✅ FIX: modelUsed dynamically show karo
-  const modelLabel = modelUsed && modelUsed !== 'none'
-    ? modelUsed.replace('gemini-', 'Gemini ').replace('-', ' ').toUpperCase().replace('GEMINI ', 'Gemini ')
-    : 'Gemini AI';
+  // ✅ FIX: formatModelName() se sahi label milega
+  const modelLabel = formatModelName(modelUsed);
 
   const aiHTML=`
   <div class="ai-card">
