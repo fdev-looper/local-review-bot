@@ -1,369 +1,636 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LocalReview AI</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<title>ReviewBot — AI-Powered Place Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#04040a;--s1:#0c0c18;--s2:#12121f;--s3:#1a1a2e;
-  --border:#ffffff0f;--border2:#ffffff18;
-  --acc:#7c6bff;--acc2:#b8a9ff;--acc3:#38d9f5;
-  --gold:#ffd166;--red:#ff6b6b;--green:#06d6a0;
-  --text:#f0f0ff;--muted:#6b6b8a;--muted2:#9090b0;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.6}
-.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.orb{position:absolute;border-radius:50%;filter:blur(80px);animation:drift 20s ease-in-out infinite}
-.orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(124,107,255,0.12),transparent 70%);top:-200px;left:-200px;animation-delay:0s}
-.orb2{width:500px;height:500px;background:radial-gradient(circle,rgba(56,217,245,0.08),transparent 70%);bottom:-150px;right:-150px;animation-delay:-7s}
-.orb3{width:400px;height:400px;background:radial-gradient(circle,rgba(255,107,107,0.06),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:-14s}
-@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(0.95)}}
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #f0c040;
+    --accent2: #e05c5c;
+    --accent3: #5ce0b0;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+    --card-shadow: 0 4px 40px rgba(0,0,0,0.5);
+  }
 
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(4,4,10,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;display:flex;align-items:center;gap:10px;letter-spacing:-0.5px}
-.nav-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--acc),var(--acc3));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem}
-.nav-pill{background:var(--s2);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:0.75rem;color:var(--muted2);display:flex;align-items:center;gap:6px}
-.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(6,214,160,0.4)}50%{opacity:0.8;box-shadow:0 0 0 6px rgba(6,214,160,0)}}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.hero{position:relative;z-index:1;padding:160px 40px 80px;max-width:900px;margin:0 auto;text-align:center}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,107,255,0.1);border:1px solid rgba(124,107,255,0.25);border-radius:20px;padding:6px 16px;font-size:0.78rem;color:var(--acc2);margin-bottom:32px;letter-spacing:0.5px}
-.hero-title{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:20px}
-.hero-title .line1{display:block;color:var(--text)}
-.hero-title .line2{display:block;background:linear-gradient(135deg,var(--acc2) 0%,var(--acc3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{color:var(--muted2);font-size:1.05rem;font-weight:300;max-width:520px;margin:0 auto 48px;line-height:1.7}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-.search-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto}
-.search-container{background:var(--s2);border:1px solid var(--border2);border-radius:20px;padding:8px 8px 8px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 0 0 0 rgba(124,107,255,0);transition:border-color 0.3s,box-shadow 0.3s}
-.search-container:focus-within{border-color:rgba(124,107,255,0.5);box-shadow:0 0 0 4px rgba(124,107,255,0.08),0 30px 80px rgba(0,0,0,0.5)}
-.search-icon{color:var(--muted);font-size:1.1rem;flex-shrink:0}
-.search-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:400;padding:10px 0}
-.search-input::placeholder{color:var(--muted)}
-.search-btn{background:linear-gradient(135deg,var(--acc),#9c8eff);border:none;border-radius:14px;padding:13px 26px;color:#fff;font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:transform 0.15s,opacity 0.15s,box-shadow 0.2s;white-space:nowrap;box-shadow:0 4px 20px rgba(124,107,255,0.3)}
-.search-btn:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(124,107,255,0.4)}
-.search-btn:active{transform:translateY(0) scale(0.98)}
-.search-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
-.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:20px}
-.chip{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:0.78rem;color:var(--muted2);cursor:pointer;transition:all 0.2s}
-.chip:hover{background:rgba(124,107,255,0.1);border-color:rgba(124,107,255,0.3);color:var(--acc2);transform:translateY(-1px)}
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
 
-.main{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 24px 100px}
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative; z-index: 1;
+  }
 
-.loading{display:none;text-align:center;padding:80px 0}
-.loader-ring{width:60px;height:60px;border:2px solid var(--s3);border-top:2px solid var(--acc);border-right:2px solid var(--acc3);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader-text{color:var(--muted2);font-size:0.9rem;line-height:2.2}
-.loader-step{transition:color 0.5s,transform 0.3s;transform:translateX(0)}
-.loader-step.active{color:var(--acc2);transform:translateX(6px)}
+  /* ── Header ── */
+  header {
+    padding: 52px 0 36px;
+    text-align: center;
+  }
 
-.error-box{display:none;background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.2);border-radius:16px;padding:18px 24px;color:var(--red);margin-bottom:28px;font-size:0.9rem}
+  .logo-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 22px;
+  }
+  .logo-badge span { width:6px; height:6px; background:var(--accent); border-radius:50%; display:inline-block; animation: pulse 2s infinite; }
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  h1 em { color: var(--accent); font-style: normal; }
 
-.place-card{background:var(--s2);border:1px solid var(--border2);border-radius:24px;padding:28px;margin-bottom:20px;display:flex;gap:24px;align-items:flex-start;animation:fadeUp 0.5s ease}
-.place-thumb{width:90px;height:90px;border-radius:16px;object-fit:cover;flex-shrink:0;background:var(--s3)}
-.place-thumb-placeholder{width:90px;height:90px;border-radius:16px;background:linear-gradient(135deg,var(--s3),var(--s2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0}
-.place-name{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px}
-.place-address{color:var(--muted);font-size:0.82rem;margin-bottom:12px}
-.rating-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.rating-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--gold);line-height:1}
-.review-count{color:var(--muted);font-size:0.82rem}
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 300;
+    margin-top: 12px;
+    max-width: 440px;
+    margin-inline: auto;
+  }
 
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;animation:fadeUp 0.5s 0.05s ease both}
-.stat-card{background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:18px 20px;text-align:center}
-.stat-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--acc2),var(--acc3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-.stat-label{color:var(--muted);font-size:0.72rem;letter-spacing:0.5px;text-transform:uppercase}
+  /* ── Search Bar ── */
+  .search-wrap {
+    margin: 36px 0 0;
+    display: flex; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 8px 8px 8px 20px;
+    transition: border-color 0.2s;
+  }
+  .search-wrap:focus-within { border-color: var(--accent); }
 
-.ai-card{background:linear-gradient(135deg,rgba(124,107,255,0.06) 0%,rgba(56,217,245,0.04) 100%);border:1px solid rgba(124,107,255,0.18);border-radius:24px;padding:28px;margin-bottom:20px;animation:fadeUp 0.5s 0.1s ease both;position:relative;overflow:hidden}
-.ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,107,255,0.5),rgba(56,217,245,0.5),transparent)}
-.ai-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.ai-title{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:0.5px;color:var(--acc2)}
-.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);animation:pulse 2s ease infinite}
-.gemini-tag{background:rgba(56,217,245,0.1);border:1px solid rgba(56,217,245,0.2);border-radius:8px;padding:3px 10px;font-size:0.7rem;color:var(--acc3);font-weight:500}
-.ai-content{color:#d0d0f0;font-size:0.92rem;line-height:1.8;white-space:pre-wrap}
-.ai-content strong{color:var(--acc2);font-weight:600}
+  #searchInput {
+    flex: 1;
+    background: none; border: none; outline: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    min-width: 0;
+  }
+  #searchInput::placeholder { color: var(--muted); }
 
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;animation:fadeUp 0.5s 0.15s ease both}
-.section-title{font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
-.count-badge{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:3px 10px;font-size:0.75rem;color:var(--muted2)}
+  #searchBtn {
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 22px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+  }
+  #searchBtn:hover { opacity: 0.88; transform: scale(0.98); }
+  #searchBtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-.reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
-.review-card{background:var(--s2);border:1px solid var(--border);border-radius:18px;padding:20px;transition:border-color 0.25s,transform 0.25s,box-shadow 0.25s;animation:fadeUp 0.5s ease both;cursor:default}
-.review-card:hover{border-color:rgba(124,107,255,0.3);transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,0.3)}
-.review-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-.review-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc3));display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#fff;flex-shrink:0}
-.review-meta{margin-left:10px;flex:1}
-.review-author{font-weight:600;font-size:0.88rem;margin-bottom:2px}
-.review-date{color:var(--muted);font-size:0.72rem}
-.review-rating-pill{display:flex;align-items:center;gap:4px;background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.15);border-radius:8px;padding:4px 8px;font-size:0.78rem;font-weight:600;color:var(--gold)}
-.review-text{color:#a0a0c0;font-size:0.83rem;line-height:1.65}
-.sentiment-bar{height:2px;border-radius:2px;margin-top:14px;background:var(--s3);overflow:hidden}
-.sentiment-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+  /* ── Status / Loader ── */
+  #status {
+    text-align: center;
+    padding: 28px 0;
+    color: var(--muted);
+    font-size: 14px;
+    display: none;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  .status-step { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
-.empty{text-align:center;padding:100px 20px;animation:fadeUp 0.5s ease}
-.empty-visual{width:120px;height:120px;background:var(--s2);border:1px solid var(--border);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;margin:0 auto 28px}
-.empty h3{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:10px}
-.empty p{color:var(--muted2);font-size:0.9rem;line-height:1.7}
+  /* ── Error ── */
+  #errorBox {
+    background: rgba(224,92,92,0.1);
+    border: 1px solid rgba(224,92,92,0.3);
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: var(--accent2);
+    font-size: 14px;
+    display: none;
+    margin-top: 24px;
+  }
 
-@media(max-width:640px){
-  nav{padding:14px 20px}
-  .hero{padding:120px 20px 60px}
-  .hero-title{font-size:2.4rem}
-  .place-card{flex-direction:column;gap:16px}
-  .stats-row{grid-template-columns:1fr 1fr}
-  .reviews-grid{grid-template-columns:1fr}
-  .main{padding:0 16px 60px}
-}
+  /* ── Results ── */
+  #results { display: none; margin-top: 36px; padding-bottom: 60px; }
+
+  /* Place header card */
+  .place-card {
+    display: flex; gap: 18px; align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .place-thumb {
+    width: 72px; height: 72px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--surface2);
+  }
+  .place-info h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .place-meta {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-top: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .stars { color: var(--accent); font-size: 14px; }
+  .rating-val { color: var(--text); font-weight: 500; }
+
+  /* AI Summary card */
+  .summary-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid #2a3060;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.4s 0.1s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(240,192,64,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .summary-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .summary-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ai-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .ai-badge.pollinations { background: rgba(92,224,176,0.12); color: var(--accent3); border: 1px solid rgba(92,224,176,0.2); }
+  .ai-badge.local { background: rgba(240,192,64,0.12); color: var(--accent); border: 1px solid rgba(240,192,64,0.2); }
+  .ai-badge.gemini { background: rgba(138,92,246,0.12); color: #b87fff; border: 1px solid rgba(138,92,246,0.2); }
+
+  .summary-body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #c8c8e0;
+  }
+  .summary-body strong { color: var(--text); }
+  .summary-body h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 18px 0 8px;
+  }
+  .summary-body h3:first-child { margin-top: 0; }
+  .summary-body ul { padding-left: 0; list-style: none; }
+  .summary-body ul li { padding: 4px 0 4px 18px; position: relative; }
+  .summary-body ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  .summary-body p { margin-bottom: 10px; }
+
+  /* Score bar */
+  .score-row {
+    display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap;
+  }
+  .score-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .score-chip .chip-label { color: var(--muted); font-size: 11px; }
+  .score-chip .chip-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+  .chip-pos { color: var(--accent3); }
+  .chip-neg { color: var(--accent2); }
+
+  /* Section label */
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* Reviews grid */
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    animation: fadeUp 0.4s 0.2s ease both;
+  }
+  .review-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .review-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .review-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .reviewer { font-size: 13px; font-weight: 500; color: var(--text); }
+  .review-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .review-stars { font-size: 13px; }
+  .review-text { font-size: 13px; line-height: 1.6; color: #a0a0c0; }
+
+  /* Rating pill */
+  .r1, .r2 { color: var(--accent2); }
+  .r3 { color: var(--accent); }
+  .r4, .r5 { color: var(--accent3); }
+
+  /* Animations */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive */
+  @media (max-width: 560px) {
+    .place-card { flex-direction: column; }
+    .reviews-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 2rem; }
+  }
 </style>
 </head>
 <body>
 
-<div class="orbs">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
-</div>
+<div class="container">
+  <header>
+    <div class="logo-badge"><span></span> Review Intelligence</div>
+    <h1>Know Before<br>You <em>Go.</em></h1>
+    <p class="subtitle">AI-powered analysis of real Google reviews — no fluff, just signal.</p>
 
-<nav>
-  <div class="nav-logo">
-    <div class="nav-logo-icon">🔍</div>
-    LocalReview AI
-  </div>
-  <div class="nav-pill">
-    <div class="nav-dot"></div>
-    Live · Powered by Gemini
-  </div>
-</nav>
-
-<div class="hero">
-  <div class="hero-badge">✦ Google Reviews &nbsp;·&nbsp; AI Analysis &nbsp;·&nbsp; Instant Insights</div>
-  <h1 class="hero-title">
-    <span class="line1">Know Before</span>
-    <span class="line2">You Go.</span>
-  </h1>
-  <p class="hero-sub">Search any clinic, restaurant, or local business — get deep AI‑powered insights from real customer reviews in seconds.</p>
-
-  <div class="search-wrap">
-    <div class="search-container">
-      <span class="search-icon">⌕</span>
-      <input class="search-input" id="searchInput" type="text"
-        placeholder="Try 'Apollo Clinic Ahmedabad' or 'Dominos Mumbai'..."
-        onkeydown="if(event.key==='Enter')doSearch()"/>
-      <button class="search-btn" id="searchBtn" onclick="doSearch()">Analyze →</button>
+    <div class="search-wrap">
+      <input id="searchInput" type="text" placeholder="Search a place… e.g. Starbucks New York" autocomplete="off" />
+      <button id="searchBtn">Analyze ↗</button>
     </div>
-    <div class="chips">
-      <span class="chip" onclick="quick('Apollo Clinic Ahmedabad')">🏥 Apollo Clinic</span>
-      <span class="chip" onclick="quick('Sterling Hospital Ahmedabad')">🏨 Sterling Hospital</span>
-      <span class="chip" onclick="quick('Dominos Pizza Surat')">🍕 Dominos Surat</span>
-      <span class="chip" onclick="quick('Café Coffee Day Vadodara')">☕ CCD Vadodara</span>
-      <span class="chip" onclick="quick('McDonald\'s Ahmedabad')">🍔 McDonald's</span>
-    </div>
-  </div>
-</div>
+  </header>
 
-<div class="main">
-  <div class="loading" id="loading">
-    <div class="loader-ring"></div>
-    <div class="loader-text">
-      <div class="loader-step" id="ls1">🗺️ &nbsp;Locating on Google Maps...</div>
-      <div class="loader-step" id="ls2">📥 &nbsp;Fetching reviews (high + low ratings)...</div>
-      <div class="loader-step" id="ls3">🤖 &nbsp;Gemini AI analyzing sentiment...</div>
-      <div class="loader-step" id="ls4">✨ &nbsp;Generating your report...</div>
-    </div>
+  <div id="status">
+    <div class="spinner"></div>
+    <div id="statusText">Fetching reviews…</div>
+    <div class="status-step" id="statusStep"></div>
   </div>
 
-  <div class="error-box" id="errorBox"></div>
-  <div id="results"></div>
+  <div id="errorBox"></div>
 
-  <div class="empty" id="emptyState">
-    <div class="empty-visual">🗺️</div>
-    <h3>Search Any Place to Begin</h3>
-    <p>Clinics · Restaurants · Hotels · Hospitals<br/>We analyze Google reviews so you don't have to.</p>
+  <div id="results">
+    <div class="place-card" id="placeCard"></div>
+    <div class="summary-card" id="summaryCard"></div>
+    <div class="section-label" style="margin-top:8px">What people are saying</div>
+    <div class="reviews-grid" id="reviewsGrid"></div>
   </div>
 </div>
 
 <script>
-const WORKER = 'https://review-bot5.giggabytelelo.workers.dev';
+const WORKER_URL = 'https://review-bot5.giggabytelelo.workers.dev';
 
-function quick(q){
-  document.getElementById('searchInput').value = q;
-  doSearch();
-  window.scrollTo({top:document.querySelector('.main').offsetTop - 80,behavior:'smooth'});
+const searchBtn   = document.getElementById('searchBtn');
+const searchInput = document.getElementById('searchInput');
+const statusEl    = document.getElementById('status');
+const statusText  = document.getElementById('statusText');
+const statusStep  = document.getElementById('statusStep');
+const errorBox    = document.getElementById('errorBox');
+const resultsEl   = document.getElementById('results');
+
+searchBtn.addEventListener('click', run);
+searchInput.addEventListener('keydown', e => e.key === 'Enter' && run());
+
+function setStatus(msg, step = '') {
+  statusEl.style.display = 'block';
+  statusText.textContent = msg;
+  statusStep.textContent = step;
+}
+function showError(msg) {
+  errorBox.textContent = '⚠ ' + msg;
+  errorBox.style.display = 'block';
+}
+function hide(el) { el.style.display = 'none'; }
+
+// ── Star renderer ─────────────────────────────────────────────────────────────
+function stars(r) {
+  const full = Math.round(r);
+  return '★'.repeat(full) + '☆'.repeat(5 - full);
+}
+function ratingClass(r) { return r <= 2 ? 'r' + r : r === 3 ? 'r3' : r <= 5 ? 'r' + r : 'r4'; }
+
+// ── LOCAL JSON analysis fallback ──────────────────────────────────────────────
+function analyzeLocally(data) {
+  const { meta, reviews } = data;
+  if (!reviews || reviews.length === 0) return null;
+
+  const good = reviews.filter(r => r.rating >= 4);
+  const bad  = reviews.filter(r => r.rating <= 2);
+  const avgRating = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+
+  // Extract keyword themes from text
+  const keywords = {
+    positive: ['atmosphere','ambiance','amazing','great','love','beautiful','fantastic','friendly','staff','recommend','best','delicious','excellent','wonderful','stunning'],
+    negative: ['slow','loud','wait','terrible','worst','rude','overpriced','disappointing','cold','wrong','awful','bad','noise','expensive','never coming back']
+  };
+
+  const posMatches = {};
+  const negMatches = {};
+
+  reviews.forEach(r => {
+    const txt = (r.text || '').toLowerCase();
+    keywords.positive.forEach(k => { if (txt.includes(k)) posMatches[k] = (posMatches[k]||0)+1; });
+    keywords.negative.forEach(k => { if (txt.includes(k)) negMatches[k] = (negMatches[k]||0)+1; });
+  });
+
+  const topPos = Object.entries(posMatches).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k);
+  const topNeg = Object.entries(negMatches).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k);
+
+  const sentiment = avgRating >= 4 ? 'mostly positive' : avgRating >= 3 ? 'mixed' : 'predominantly negative';
+  const posRate = Math.round(good.length / reviews.length * 100);
+  const negRate = Math.round(bad.length  / reviews.length * 100);
+
+  const positiveSnippets = good.slice(0,2).map(r => r.text ? `"${r.text.slice(0,80)}…"` : '').filter(Boolean);
+  const negativeSnippets = bad.slice(0,2).map(r => r.text ? `"${r.text.slice(0,80)}…"` : '').filter(Boolean);
+
+  return {
+    source: 'local',
+    posRate, negRate, sentiment, topPos, topNeg,
+    positiveSnippets, negativeSnippets,
+    avgRating: avgRating.toFixed(1),
+    totalSampled: reviews.length
+  };
 }
 
-function starsHTML(rating){
-  let html='';
-  for(let i=1;i<=5;i++){
-    const full=i<=Math.floor(rating);
-    const half=!full&&i<=Math.ceil(rating)&&rating%1>=0.4;
-    const c=full?'#ffd166':half?'#ffd16688':'#2a2a40';
-    const sc=full||half?'#ffd166':'#2a2a40';
-    html+=`<svg viewBox="0 0 24 24" style="width:15px;height:15px;display:inline-block;vertical-align:middle"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" fill="${c}" stroke="${sc}" stroke-width="1.5"/></svg>`;
+function renderLocalSummary(analysis, meta) {
+  const { posRate, negRate, sentiment, topPos, topNeg, positiveSnippets, negativeSnippets, avgRating } = analysis;
+
+  const verdict = posRate >= 70
+    ? `✅ Worth visiting — most guests leave happy.`
+    : posRate >= 50
+    ? `⚖️ Mixed bag — read reviews before deciding.`
+    : `❌ Proceed with caution — complaints outweigh praise.`;
+
+  let html = `
+    <div class="score-row">
+      <div class="score-chip"><div><div class="chip-label">Positive</div><div class="chip-val chip-pos">${posRate}%</div></div></div>
+      <div class="score-chip"><div><div class="chip-label">Negative</div><div class="chip-val chip-neg">${negRate}%</div></div></div>
+      <div class="score-chip"><div><div class="chip-label">Sample Avg</div><div class="chip-val">${avgRating}★</div></div></div>
+    </div>
+    <h3 style="margin-top:20px">Overall Sentiment</h3>
+    <p>Reviews for <strong>${meta.placeName}</strong> are <strong>${sentiment}</strong> — ${posRate}% of sampled reviews rate 4★ or higher.</p>
+  `;
+  if (topPos.length) {
+    html += `<h3>What People Love ❤️</h3><ul>${topPos.map(k=>`<li>Frequently praised for <strong>${k}</strong></li>`).join('')}</ul>`;
   }
+  if (topNeg.length) {
+    html += `<h3>Common Complaints ⚠️</h3><ul>${topNeg.map(k=>`<li>Recurring mentions of <strong>${k}</strong></li>`).join('')}</ul>`;
+  }
+  if (positiveSnippets.length) {
+    html += `<h3>Visitor Highlights 💡</h3><ul>${positiveSnippets.map(s=>`<li style="font-style:italic;color:#8888b0">${s}</li>`).join('')}</ul>`;
+  }
+  html += `<h3>Verdict 🏆</h3><p><strong>${verdict}</strong></p>`;
+
   return html;
 }
 
-function avatarLetter(name){return (name||'A').trim()[0].toUpperCase()}
+// ── Pollinations AI (free, no key) ────────────────────────────────────────────
+async function analyzeWithPollinations(placeName, reviews, meta) {
+  const reviewsText = reviews.map(r => `[${r.rating}★] ${r.author}: ${r.text?.slice(0,120) || ''}`).join('\n');
+  const prompt = `You are a concise local guide. Analyze these Google reviews for "${meta.placeName || placeName}" and write a COMPLETE structured report.
 
-function sentimentGrad(rating){
-  if(rating>=4)return'linear-gradient(90deg,#06d6a0,#38d9f5)';
-  if(rating>=3)return'linear-gradient(90deg,#ffd166,#ffb347)';
-  return'linear-gradient(90deg,#ff6b6b,#ff4444)';
+Reviews:
+${reviewsText}
+
+Overall: ${meta.rating}/5 (${meta.totalReviews} total reviews)
+
+Write EXACTLY this structure:
+
+**1. Overall Sentiment**
+(1-2 lines)
+
+**2. What People Love ❤️**
+• point 1
+• point 2
+
+**3. Common Complaints ⚠️**
+• point 1
+• point 2
+
+**4. Visitor Tips 💡**
+• tip 1
+• tip 2
+• tip 3
+
+**5. AI Verdict 🏆**
+(one bold recommendation sentence)
+
+Be direct. Use emojis. Complete all 5 sections.`;
+
+  const encodedPrompt = encodeURIComponent(prompt);
+  const url = `https://text.pollinations.ai/${encodedPrompt}?model=openai&seed=42&private=true`;
+
+  const res = await fetch(url, { signal: AbortSignal.timeout(18000) });
+  if (!res.ok) throw new Error(`Pollinations HTTP ${res.status}`);
+  const text = await res.text();
+  if (!text || text.length < 50) throw new Error('Empty response from Pollinations');
+  return text;
 }
 
-// ✅ FIX: Correct model name display
-// "gemini-2.5-flash-preview-04-17" → "Gemini 2.5 Flash"
-// "gemini-2.0-flash" → "Gemini 2.0 Flash"
-// "gemini-1.5-flash" → "Gemini 1.5 Flash"
-function formatModelName(modelId) {
-  if (!modelId || modelId === 'none') return 'Gemini AI';
-  // Extract version + type from model id
-  // e.g. "gemini-2.5-flash-preview-04-17" → "Gemini 2.5 Flash"
-  // e.g. "gemini-2.0-flash-lite" → "Gemini 2.0 Flash Lite"
-  const match = modelId.match(/^gemini-(\d+\.\d+)-(\w+)/);
-  if (match) {
-    const version = match[1];  // "2.5"
-    const type = match[2];     // "flash" or "pro"
-    const typeCap = type.charAt(0).toUpperCase() + type.slice(1); // "Flash"
-    // Check for lite suffix
-    const isLite = modelId.includes('flash-lite');
-    return `Gemini ${version} ${typeCap}${isLite ? ' Lite' : ''}`;
+// ── Render markdown-ish AI text ───────────────────────────────────────────────
+function renderMarkdown(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^#{1,3}\s+(.+)$/gm, '<h3>$1</h3>')
+    .replace(/^•\s+(.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[hup])/gm, '')
+    .split('\n').map(line => {
+      if (!line.startsWith('<')) return line ? `<p>${line}</p>` : '';
+      return line;
+    }).join('');
+}
+
+// ── Main run ──────────────────────────────────────────────────────────────────
+async function run() {
+  const place = searchInput.value.trim();
+  if (!place) return;
+
+  hide(errorBox); hide(resultsEl);
+  errorBox.style.display = 'none';
+  resultsEl.style.display = 'none';
+  searchBtn.disabled = true;
+
+  setStatus('Fetching reviews…', 'Contacting Google Maps data…');
+
+  let data;
+  try {
+    const res = await fetch(`${WORKER_URL}/search?place=${encodeURIComponent(place)}`);
+    data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Worker returned an error');
+  } catch (err) {
+    hide(statusEl);
+    searchBtn.disabled = false;
+    showError(err.message);
+    return;
   }
-  // Fallback: clean up dashes
-  return modelId.replace(/^gemini-/, 'Gemini ').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
-let stepTimer;
-function animateSteps(){
-  clearInterval(stepTimer);
-  ['ls1','ls2','ls3','ls4'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById('ls1').classList.add('active');
-  let i=0;
-  stepTimer=setInterval(()=>{
-    i++;if(i<4)document.getElementById('ls'+(i+1)).classList.add('active');
-    else clearInterval(stepTimer);
-  },1400);
-}
+  const { reviews, summary: workerSummary, modelUsed } = data;
+  const { meta } = reviews;
 
-async function doSearch(){
-  const q=document.getElementById('searchInput').value.trim();
-  if(!q){alert('Please enter a place name!');return;}
-
-  document.getElementById('loading').style.display='block';
-  document.getElementById('results').innerHTML='';
-  document.getElementById('errorBox').style.display='none';
-  document.getElementById('emptyState').style.display='none';
-  document.getElementById('searchBtn').disabled=true;
-  document.getElementById('searchBtn').textContent='...';
-  animateSteps();
-
-  try{
-    const res=await fetch(`${WORKER}/search?place=${encodeURIComponent(q)}`);
-    const data=await res.json();
-    if(!res.ok||data.error)throw new Error(data.error||'Something went wrong');
-    renderResults(data);
-  }catch(err){
-    const box=document.getElementById('errorBox');
-    box.innerHTML=`❌ <strong>Error:</strong> ${err.message}. Try a more specific search like "Apollo Clinic Ahmedabad".`;
-    box.style.display='block';
-    document.getElementById('emptyState').style.display='block';
-  }finally{
-    clearInterval(stepTimer);
-    document.getElementById('loading').style.display='none';
-    document.getElementById('searchBtn').disabled=false;
-    document.getElementById('searchBtn').textContent='Analyze →';
-  }
-}
-
-function renderResults(data){
-  const { place, reviews, summary, modelUsed } = data;
-  const { meta, reviews: rvs } = reviews;
-
-  const pos = rvs.filter(r => r.rating >= 4).length;
-  const neg = rvs.filter(r => r.rating <= 2).length;
-  const avg = rvs.length
-    ? (rvs.reduce((a,r) => a + r.rating, 0) / rvs.length).toFixed(1)
-    : (meta.rating || 0);
-
-  // ✅ FIX: summary fallback + trim whitespace
-  const summaryText = (summary || '').trim() || 'AI analysis unavailable for this place.';
-  const fmt = summaryText
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-  const placeHTML=`
-  <div class="place-card">
-    ${meta.thumbnail
-      ?`<img src="${meta.thumbnail}" class="place-thumb" alt="place" onerror="this.outerHTML='<div class=place-thumb-placeholder>🏢</div>'">`
-      :`<div class="place-thumb-placeholder">🏢</div>`}
-    <div style="flex:1;min-width:0">
-      <div class="place-name">${meta.placeName||place}</div>
-      ${meta.address?`<div class="place-address">📍 ${meta.address}</div>`:''}
-      <div class="rating-row">
-        <div class="rating-num">${meta.rating||avg}</div>
-        <div style="display:flex;gap:2px;align-items:center">${starsHTML(parseFloat(meta.rating||avg))}</div>
-        ${meta.totalReviews?`<div class="review-count">${Number(meta.totalReviews).toLocaleString()} reviews</div>`:''}
+  // ── Render place card ──
+  document.getElementById('placeCard').innerHTML = `
+    ${meta.thumbnail ? `<img class="place-thumb" src="${meta.thumbnail}" alt="${meta.placeName}" onerror="this.style.display='none'">` : ''}
+    <div class="place-info">
+      <h2>${meta.placeName}</h2>
+      <div class="place-meta">
+        <span><span class="stars">${stars(meta.rating)}</span> <span class="rating-val">${meta.rating}</span></span>
+        <span>${(meta.totalReviews || 0).toLocaleString()} reviews</span>
+        ${meta.address ? `<span>${meta.address}</span>` : ''}
       </div>
     </div>
-  </div>`;
+  `;
 
-  const statsHTML=`
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-num">${meta.rating||avg}</div>
-      <div class="stat-label">Overall Rating</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">${pos}</div>
-      <div class="stat-label">Positive Reviews</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">${neg}</div>
-      <div class="stat-label">Critical Reviews</div>
-    </div>
-  </div>`;
+  // ── Determine AI summary source ──
+  let summaryHTML = '';
+  let aiSource = '';
 
-  // ✅ FIX: formatModelName() se sahi label milega
-  const modelLabel = formatModelName(modelUsed);
+  // Priority 1: Gemini via worker (if it actually worked)
+  if (workerSummary && modelUsed && modelUsed !== 'none') {
+    summaryHTML = renderMarkdown(workerSummary);
+    aiSource = 'gemini';
+    setStatus('Rendering summary…', `Powered by ${modelUsed}`);
+  } else {
+    // Priority 2: Pollinations (free, no key)
+    setStatus('Analyzing reviews…', 'Using Pollinations AI (free)…');
+    try {
+      const pollinationsText = await analyzeWithPollinations(place, reviews.reviews, meta);
+      summaryHTML = renderMarkdown(pollinationsText);
+      aiSource = 'pollinations';
+    } catch (polErr) {
+      console.warn('Pollinations failed:', polErr.message);
+      // Priority 3: Local JSON analysis
+      setStatus('Analyzing locally…', 'AI unavailable — using smart fallback…');
+      const localAnalysis = analyzeLocally(reviews);
+      if (localAnalysis) {
+        summaryHTML = renderLocalSummary(localAnalysis, meta);
+        aiSource = 'local';
+      } else {
+        summaryHTML = '<p>Could not generate summary for this place.</p>';
+        aiSource = 'local';
+      }
+    }
+  }
 
-  const aiHTML=`
-  <div class="ai-card">
-    <div class="ai-header">
-      <div class="ai-title"><div class="ai-dot"></div>AI ANALYSIS REPORT</div>
-      <div class="gemini-tag">${modelLabel}</div>
+  // ── Render summary card ──
+  const badgeMap = {
+    gemini:      { cls: 'gemini',      label: 'Gemini AI' },
+    pollinations:{ cls: 'pollinations',label: 'Pollinations AI' },
+    local:       { cls: 'local',       label: 'Smart Analysis' },
+  };
+  const badge = badgeMap[aiSource] || badgeMap.local;
+
+  document.getElementById('summaryCard').innerHTML = `
+    <div class="summary-header">
+      <div class="summary-title">✦ AI Summary</div>
+      <span class="ai-badge ${badge.cls}">${badge.label}</span>
     </div>
-    <div class="ai-content">${fmt}</div>
-  </div>`;
+    <div class="summary-body">${summaryHTML}</div>
+  `;
 
-  const reviewsHTML=rvs.length?`
-  <div class="section-header">
-    <div class="section-title">Customer Reviews</div>
-    <div class="count-badge">${rvs.length} fetched</div>
-  </div>
-  <div class="reviews-grid">
-    ${rvs.map((r,i)=>`
-    <div class="review-card" style="animation-delay:${i*0.06}s">
+  // ── Render reviews grid ──
+  const grid = document.getElementById('reviewsGrid');
+  grid.innerHTML = reviews.reviews.map(r => `
+    <div class="review-card">
       <div class="review-top">
-        <div style="display:flex;align-items:center;flex:1;min-width:0">
-          <div class="review-avatar">${avatarLetter(r.author)}</div>
-          <div class="review-meta">
-            <div class="review-author">${r.author}</div>
-            <div class="review-date">${r.date||''}</div>
-          </div>
+        <div>
+          <div class="reviewer">${r.author}</div>
+          <div class="review-date">${r.date}</div>
         </div>
-        <div class="review-rating-pill">★ ${r.rating}</div>
+        <div class="review-stars ${ratingClass(r.rating)}">${stars(r.rating)}</div>
       </div>
-      <div class="review-text">${r.text||'<em style="opacity:0.4">No text provided</em>'}</div>
-      <div class="sentiment-bar"><div class="sentiment-fill" style="width:${(r.rating/5)*100}%;background:${sentimentGrad(r.rating)}"></div></div>
-    </div>`).join('')}
-  </div>`:'';
+      <div class="review-text">${r.text ? r.text.slice(0, 200) + (r.text.length > 200 ? '…' : '') : 'No text'}</div>
+    </div>
+  `).join('');
 
-  document.getElementById('results').innerHTML=placeHTML+statsHTML+aiHTML+reviewsHTML;
+  hide(statusEl);
+  resultsEl.style.display = 'block';
+  searchBtn.disabled = false;
 }
 </script>
 </body>
